@@ -62,10 +62,14 @@ public class TrasmissioneMeteo {
     }
 
     public static void main(String[] args) throws IOException, FileNotFoundException, ClassNotFoundException, InterruptedException {
-        Thread t1 = new Thread(() -> { runServer(); }); 
+        Thread t1 = new Thread(() -> {
+            runServer();
+        });
         t1.start();
 
-        Thread t2 = new Thread(() -> { runClient(); });
+        Thread t2 = new Thread(() -> {
+            runClient();
+        });
         t2.start();
 
         t1.join();
