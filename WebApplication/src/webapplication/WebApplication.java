@@ -59,7 +59,7 @@ public class WebApplication {
             Socket client = s.accept();
             String request = receiveHTMLRequest(client);
 
-            /* Request: GET /* ..., Si estrapola il metodo dal contenuto */
+            /* Request = GET /* ..., Si estrapola il metodo dal contenuto */
             String requestType = request.split(" /")[0];
 
             /* Si estrapola il contenuto della richiesta*/
