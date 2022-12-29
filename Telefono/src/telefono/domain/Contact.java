@@ -61,4 +61,10 @@ public class Contact implements IPersistenceObject<Integer> {
             return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return surname + " " + name;
+    }
+
 }

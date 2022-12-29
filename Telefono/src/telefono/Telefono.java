@@ -1,25 +1,23 @@
 package telefono;
 
+import telefono.controller.Controller;
+import telefono.domain.Contact;
+import telefono.persistence.IPersistence;
+import telefono.persistence.factory.ContactPersistenceFactory;
+import telefono.view.GUIView;
+import telefono.view.IView;
+
 public class Telefono {
 
     public static void main(String[] args) {
-        /**
-         * Realizzare una rubrica telefonico: La memorizzazione viene decisa dal
-         * client: (Persistenza su File, su RAM, su Database). Fornire layer di
-         * persistenza, realizzare la GUI e batterie di testing.
-         */
+        IPersistence<Integer, Contact> persistence = ContactPersistenceFactory.getPersistenceRAM();
+        persistence.create(new Contact(0, "Joe", "Biden", "777"));
+        persistence.create(new Contact(1, "Vladimir", "Putin", "666"));
+        persistence.create(new Contact(2, "Sergio", "Mattarella", "555"));
+        persistence.create(new Contact(3, "Kishid", "Fumio", "444"));
 
-        /**
-         * Contact: id, name, surname, phoneNumber.
-         */
-        /**
-         * Query: getListByName, getListBySurname
-         */
-        /**
-         * GUI: onUserElementClick -> getUserId, showUserWindows(userId)
-         */
-        /**
-         * TODO: DatabasePersistence, PersistenceFactory, GUI
-         */
+        Controller controller = new Controller(null, persistence);
+        IView view = new GUIView(controller);
+        controller.setView(view);
     }
 }

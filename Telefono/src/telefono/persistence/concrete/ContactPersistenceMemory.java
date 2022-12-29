@@ -9,11 +9,11 @@ import java.util.List;
 import telefono.domain.Contact;
 import telefono.persistence.MemoryPersistenceFacade;
 
-public class ContactsPersistenceMemory extends MemoryPersistenceFacade<Integer, Contact> {
+public class ContactPersistenceMemory extends MemoryPersistenceFacade<Integer, Contact> {
 
     private static ArrayList<Contact> contacts = null;
 
-    public ContactsPersistenceMemory(String path) {
+    public ContactPersistenceMemory(String path) {
         super(path);
     }
 
