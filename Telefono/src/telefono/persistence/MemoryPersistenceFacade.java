@@ -51,16 +51,13 @@ public abstract class MemoryPersistenceFacade<K, T extends IPersistenceObject<K>
     @Override
     @SuppressWarnings("unchecked")
     public void create(T value) throws IllegalArgumentException {
-        T item = null;
         try {
-            item = read(value.getKey());
+            T item = read(value.getKey());
+            throw new IllegalArgumentException("Key already been used: @key = " + item.getKey());
         } catch (IllegalArgumentException ex) {
             items.add((T) value.getClone());
             writeChanges();
-        }
-
-        if (item != null) {
-            throw new IllegalArgumentException("Key already been used: @key = " + item.getKey());
+            return;
         }
     }
 
@@ -118,7 +115,7 @@ public abstract class MemoryPersistenceFacade<K, T extends IPersistenceObject<K>
             throw new IllegalArgumentException("Invalid Key");
         }
 
-        items.remove(getItem(item.getKey()));
+        items.remove(getItem(key));
         writeChanges();
     }
 
