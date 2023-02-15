@@ -1,6 +1,8 @@
 package parser;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -105,6 +107,106 @@ public class CSVParser {
     }
 
     /**
+     * aggiunge l'elenco dei valori presenti negli oggetti della lista
+     * <code>objects</code> nel file <code>csvPath</code> csv
+     *
+     * @param classType la classe dell'oggetto da scrivere: <bold>deve essere un
+     * Java Baan<bold>
+     * @param objects: listadegli oggetti da scrivere
+     * @param csvPath il percorso del file in scrittura
+     * @param delimiter stringa che serpare i campi (USA: ',' - EUROPA: ';')
+     *
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws IllegalArgumentException
+     * @throws InvalidFileTypeException
+     * @throws IllegalAccessException
+     */
+    public static void writeToCSV(Class<?> classType, List<Object> objects, String csvPath, String delimiter) throws IOException, FileNotFoundException, IllegalArgumentException, InvalidFileTypeException, IllegalAccessException {
+        for (Object object : objects) {
+            writeObjectToCSV(classType, object, csvPath, delimiter);
+        }
+    }
+
+    /**
+     * aggiunge una riga di valori presenti in <code>object</code> nel file
+     * <code>csvPath</code> csv
+     *
+     * @param classType la classe dell'oggetto da scrivere: <bold>deve essere un
+     * Java Baan<bold>
+     * @param object: oggetto che viene scritto
+     * @param csvPath il percorso del file in scrittura
+     * @param delimiter stringa che serpare i campi (USA: ',' - EUROPA: ';')
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws InvalidFileTypeException();
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     */
+    public static void writeObjectToCSV(Class<?> classType, Object object, String csvPath, String delimiter) throws IOException, FileNotFoundException, IllegalArgumentException, IllegalAccessException, InvalidFileTypeException {
+        if (!isCSVPath(csvPath)) {
+            throw new InvalidFileTypeException();
+        }
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, true));
+        String row = objectValuesToCSVRow(classType, object, delimiter);
+        writer.append(row);
+
+        writer.close();
+    }
+
+    /**
+     * scrive il nome dei campi di una classe <code>classType</code> in formato
+     * csv
+     *
+     * @param classType la classe dell'oggetto da scrivere: <bold>deve essere un
+     * Java Baan<bold>
+     * @param delimiter stringa che serpare i campi (USA: ',' - EUROPA: ';')
+     * @return
+     */
+    public static String fieldsToCSVFields(Class<?> classType, String delimiter) {
+        List<Field> fields = Arrays.asList(classType.getDeclaredFields());
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Field field : fields) {
+            stringBuilder.append(field.getName());
+            stringBuilder.append(delimiter);
+        }
+
+        stringBuilder.setCharAt(stringBuilder.length() - 1, '\n');
+        return stringBuilder.toString();
+    }
+
+    /**
+     * scrive i valori di un'oggetto <code>object</code> di classe
+     * <code>classType</code> in formato csv
+     *
+     * @param classType la classe dell'oggetto da scrivere: <bold>deve essere un
+     * Java Baan<bold>
+     * @param object: oggetto che viene scritto
+     * @param delimiter stringa che serpare i campi (USA: ',' - EUROPA: ';')
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     */
+    public static String objectValuesToCSVRow(Class<?> classType, Object object, String delimiter) throws IllegalArgumentException, IllegalAccessException {
+        List<Field> fields = Arrays.asList(classType.getDeclaredFields());
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Field field : fields) {
+            boolean accessible = field.isAccessible();
+            field.setAccessible(true);
+
+            stringBuilder.append(field.get(object));
+            stringBuilder.append(delimiter);
+            field.setAccessible(accessible);
+        }
+
+        stringBuilder.setCharAt(stringBuilder.length() - 1, '\n');
+        return stringBuilder.toString();
+    }
+
+    /**
      * verifica che l'estensione del percorso path sia .csv
      *
      * @param path il percorso
@@ -114,5 +216,4 @@ public class CSVParser {
         String extension = path.substring(path.lastIndexOf('.') + 1);
         return "csv".equals(extension);
     }
-
 }
