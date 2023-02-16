@@ -36,6 +36,7 @@ public class CSVParser {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
+     * @throws parser.InvalidFileTypeException
      */
     public static List<Object> readFromCSV(Class<?> typeClass, String csvPath, String csvDelimiter) throws IOException, FileNotFoundException, NoSuchMethodException, ClassNotFoundException, UnmatchingFieldNameException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InvalidFileTypeException {
 
@@ -141,6 +142,7 @@ public class CSVParser {
      * @throws FileNotFoundException
      * @throws InvalidFileTypeException();
      * @throws IllegalArgumentException
+     * @throws parser.InvalidFileTypeException
      * @throws IllegalAccessException
      */
     public static void writeObjectToCSV(Class<?> classType, Object object, String csvPath, String delimiter) throws IOException, FileNotFoundException, IllegalArgumentException, IllegalAccessException, InvalidFileTypeException {
@@ -148,11 +150,10 @@ public class CSVParser {
             throw new InvalidFileTypeException();
         }
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, true));
-        String row = objectValuesToCSVRow(classType, object, delimiter);
-        writer.append(row);
-
-        writer.close();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, true))) {
+            String record = objectValuesToCSVRow(classType, object, delimiter);
+            writer.append(record);
+        }
     }
 
     /**
@@ -165,11 +166,12 @@ public class CSVParser {
      * @return
      */
     public static String fieldsToCSVFields(Class<?> classType, String delimiter) {
-        List<Field> fields = Arrays.asList(classType.getDeclaredFields());
+        List<Field> fields = FieldUtilities.getFields(classType);
+        List<String> fieldsNames = FieldUtilities.getFieldsNames(fields);
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (Field field : fields) {
-            stringBuilder.append(field.getName());
+        for (String fieldName : fieldsNames) {
+            stringBuilder.append(fieldName);
             stringBuilder.append(delimiter);
         }
 
@@ -190,14 +192,15 @@ public class CSVParser {
      * @throws IllegalAccessException
      */
     public static String objectValuesToCSVRow(Class<?> classType, Object object, String delimiter) throws IllegalArgumentException, IllegalAccessException {
-        List<Field> fields = Arrays.asList(classType.getDeclaredFields());
+        List<Field> fields = FieldUtilities.getFields(classType);
         StringBuilder stringBuilder = new StringBuilder();
 
         for (Field field : fields) {
             boolean accessible = field.isAccessible();
             field.setAccessible(true);
 
-            stringBuilder.append(field.get(object));
+            Object value = field.get(object);
+            stringBuilder.append(value);
             stringBuilder.append(delimiter);
             field.setAccessible(accessible);
         }

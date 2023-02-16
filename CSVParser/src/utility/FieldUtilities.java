@@ -16,7 +16,9 @@ public class FieldUtilities {
      * @return lista degli attributi
      */
     public static List<Field> getFields(Class<?> typeClass) {
-        return Arrays.asList(typeClass.getDeclaredFields());
+        List<Field> fields = Arrays.asList(typeClass.getDeclaredFields());
+        fields.remove(0); // serialVersionUID
+        return fields;
     }
 
     /**
@@ -28,7 +30,7 @@ public class FieldUtilities {
      * @return lista delle classi (DataType) degli attributi
      */
     public static List<Class<?>> getFieldsTypes(Class<?> typeClass) {
-        List<Field> fields = Arrays.asList(typeClass.getDeclaredFields());
+        List<Field> fields = getFields(typeClass);
         List<Class<?>> classes = new ArrayList<>();
         fields.forEach((field) -> {
             classes.add(field.getType());
@@ -37,7 +39,12 @@ public class FieldUtilities {
         return classes;
     }
 
-    // OK
+    /**
+     * fornisce la lista dei nomi degli attributi <code>fields</code>
+     *
+     * @param fields attributi
+     * @return nomi degli attributi
+     */
     public static List<String> getFieldsNames(List<Field> fields) {
         List<String> fieldsName = new ArrayList<>();
         fields.forEach((field) -> {
