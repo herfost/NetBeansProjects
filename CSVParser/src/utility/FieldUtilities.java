@@ -17,6 +17,7 @@ public class FieldUtilities {
      */
     public static List<Field> getFields(Class<?> typeClass) {
         List<Field> fields = Arrays.asList(typeClass.getDeclaredFields());
+        fields = new ArrayList<>(fields);
         fields.remove(0); // serialVersionUID
         return fields;
     }
